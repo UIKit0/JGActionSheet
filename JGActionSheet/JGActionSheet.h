@@ -76,6 +76,8 @@ typedef NS_ENUM(NSUInteger, JGActionSheetArrowDirection) {
  */
 + (instancetype)sectionWithTitle:(NSString *)title message:(NSString *)message buttonTitles:(NSArray *)buttonTitles buttonStyle:(JGActionSheetButtonStyle)buttonStyle;
 
++ (instancetype)sectionWithTitle:(NSString *)title message:(NSString *)message buttonTitles:(NSArray *)buttonTitles images:(NSArray *)images buttonStyle:(JGActionSheetButtonStyle)buttonStyle;
+
 /**
  Initializes the section with buttons.
  @param title The title of the section. (Optional)

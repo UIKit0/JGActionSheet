@@ -54,8 +54,8 @@
 #define kArrowBaseWidth 20.0f
 #define kArrowHeight 10.0f
 
-#define kShadowRadius 4.0f
-#define kShadowOpacity 0.2f
+#define kShadowRadius 1.0f
+#define kShadowOpacity 0.7f
 
 #define kFixedWidth 320.0f
 #define kFixedWidthContinuous 300.0f
@@ -189,6 +189,7 @@ static BOOL disableCustomEasing = NO;
 @interface JGActionSheetSection ()
 
 @property (nonatomic, assign) NSUInteger index;
+@property (nonatomic, strong) NSArray *lines;
 
 @property (nonatomic, copy) void (^buttonPressedBlock)(NSIndexPath *indexPath);
 
@@ -208,7 +209,15 @@ static BOOL disableCustomEasing = NO;
     return [[self alloc] initWithTitle:title message:message buttonTitles:buttonTitles buttonStyle:buttonStyle];
 }
 
-- (instancetype)initWithTitle:(NSString *)title message:(NSString *)message buttonTitles:(NSArray *)buttonTitles buttonStyle:(JGActionSheetButtonStyle)buttonStyle {
++ (instancetype)sectionWithTitle:(NSString *)title message:(NSString *)message buttonTitles:(NSArray *)buttonTitles images:(NSArray *)images buttonStyle:(JGActionSheetButtonStyle)buttonStyle {
+    return [[self alloc] initWithTitle:title message:message buttonTitles:buttonTitles images:images buttonStyle:buttonStyle];
+}
+
+- (instancetype)initWithTitle:(NSString *)title message:(NSString *)message buttonTitles:(NSArray *)buttonTitles buttonStyle:(JGActionSheetButtonStyle)buttonStyle{
+    return [self initWithTitle:title message:message buttonTitles:buttonTitles images:nil buttonStyle:buttonStyle];
+}
+
+- (instancetype)initWithTitle:(NSString *)title message:(NSString *)message buttonTitles:(NSArray *)buttonTitles images:(NSArray *)images buttonStyle:(JGActionSheetButtonStyle)buttonStyle {
     self = [super init];
     
     if (self) {
@@ -244,6 +253,7 @@ static BOOL disableCustomEasing = NO;
         
         if (buttonTitles.count) {
             NSMutableArray *buttons = [NSMutableArray arrayWithCapacity:buttonTitles.count];
+            NSMutableArray *lines = [NSMutableArray arrayWithCapacity:buttonTitles.count];
             
             NSInteger index = 0;
             
@@ -251,13 +261,25 @@ static BOOL disableCustomEasing = NO;
                 JGButton *b = [self makeButtonWithTitle:str style:buttonStyle];
                 b.row = (NSUInteger)index;
                 
+                if (index < images.count) {
+                    b.imageEdgeInsets = UIEdgeInsetsMake(0, -10, 0, 0);
+                    [b setImage:images[index] forState:UIControlStateNormal];
+                }
                 [self addSubview:b];
                 
                 [buttons addObject:b];
                 
+                if (index + 1 < buttonTitles.count) {
+                    UIView *line = [[UIView alloc] init];
+                    line.backgroundColor = [UIColor lightGrayColor];
+                    [self addSubview:line];
+                    
+                    [lines addObject:line];
+                }
+                
                 index++;
             }
-            
+            _lines = lines.copy;
             _buttons = buttons.copy;
         }
     }
@@ -364,14 +386,17 @@ static BOOL disableCustomEasing = NO;
         font = [UIFont systemFontOfSize:15.0f];
         titleColor = [UIColor blackColor];
         
-        backgroundColor = [UIColor colorWithWhite:0.95f alpha:1.0f];
-        borderColor = [UIColor colorWithWhite:0.9f alpha:1.0f];
+//        backgroundColor = [UIColor clearColor];
+//        borderColor = [UIColor clearColor];
+        backgroundColor = [UIColor whiteColor];
+//        borderColor = [UIColor colorWithWhite:0.9f alpha:1.0f];
     }
     else if (buttonStyle == JGActionSheetButtonStyleCancel) {
         font = [UIFont boldSystemFontOfSize:15.0f];
         titleColor = [UIColor blackColor];
         
-        backgroundColor = [UIColor colorWithWhite:0.95f alpha:1.0f];
+        backgroundColor = [UIColor whiteColor];
+//        backgroundColor = [UIColor colorWithWhite:0.95f alpha:1.0f];
         borderColor = [UIColor colorWithWhite:0.9f alpha:1.0f];
     }
     else if (buttonStyle == JGActionSheetButtonStyleRed) {
@@ -409,10 +434,10 @@ static BOOL disableCustomEasing = NO;
 - (JGButton *)makeButtonWithTitle:(NSString *)title style:(JGActionSheetButtonStyle)style {
     JGButton *b = [[JGButton alloc] init];
     
-    b.layer.cornerRadius = 2.0f;
-    b.layer.masksToBounds = YES;
-    b.layer.borderWidth = 1.0f;
-    
+//    b.layer.cornerRadius = 2.0f;
+//    b.layer.masksToBounds = YES;
+//    b.layer.borderWidth = 1.0f;
+//    
     [b setTitle:title forState:UIControlStateNormal];
     
     [b addTarget:self action:@selector(buttonPressed:) forControlEvents:UIControlEventTouchUpInside];
@@ -429,7 +454,7 @@ static BOOL disableCustomEasing = NO;
 }
 
 - (CGRect)layoutForWidth:(CGFloat)width {
-    CGFloat buttonHeight = 40.0f;
+    CGFloat buttonHeight = 35.f;
     CGFloat spacing = kSpacing;
     
     CGFloat height = 0.0f;
@@ -467,14 +492,22 @@ static BOOL disableCustomEasing = NO;
         height += messageLabelHeight;
     }
     
+    NSUInteger index = 0;
     for (UIButton *button in self.buttons) {
         height += spacing;
         
         button.frame = (CGRect){{spacing, height}, {width-spacing*2.0f, buttonHeight}};
         
         height += buttonHeight;
-    }
     
+        if (index < self.lines.count) {
+            UIView *line = self.lines[index];
+            line.frame = CGRectMake(0, height + 3, width, 1);
+        }
+        
+        index ++;
+    }
+
     if (self.contentView) {
         height += spacing;
         
@@ -535,7 +568,7 @@ static BOOL disableCustomEasing = NO;
         _scrollViewHost.backgroundColor = [UIColor clearColor];
         
         _scrollView = [[UIScrollView alloc] init];
-        _scrollView.backgroundColor = [UIColor clearColor];
+        _scrollView.backgroundColor = [UIColor colorWithWhite:0.95f alpha:0.85f];
         _scrollView.showsHorizontalScrollIndicator = NO;
         _scrollView.showsVerticalScrollIndicator = NO;
         
