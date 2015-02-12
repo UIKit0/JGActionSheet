@@ -387,7 +387,7 @@ static BOOL disableCustomEasing = NO;
         titleColor = [UIColor blackColor];
         
 //        backgroundColor = [UIColor clearColor];
-//        borderColor = [UIColor clearColor];
+        borderColor = [UIColor colorWithWhite:0.9f alpha:1.0f];
         backgroundColor = [UIColor whiteColor];
 //        borderColor = [UIColor colorWithWhite:0.9f alpha:1.0f];
     }
