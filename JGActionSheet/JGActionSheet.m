@@ -568,14 +568,14 @@ static BOOL disableCustomEasing = NO;
         _scrollViewHost.backgroundColor = [UIColor clearColor];
         
         _scrollView = [[UIScrollView alloc] init];
-        _scrollView.backgroundColor = [UIColor colorWithWhite:0.95f alpha:0.85f];
+        _scrollView.backgroundColor = [UIColor clearColor];
         _scrollView.showsHorizontalScrollIndicator = NO;
         _scrollView.showsVerticalScrollIndicator = NO;
         
         [_scrollViewHost addSubview:_scrollView];
         [self addSubview:_scrollViewHost];
         
-        self.backgroundColor = [UIColor colorWithWhite:0.0f alpha:0.3f];
+        self.backgroundColor = [UIColor clearColor];
         
         _sections = sections;
         
@@ -710,7 +710,7 @@ static BOOL disableCustomEasing = NO;
         CGFloat finalY = 0.0f;
         
         if (fitToRect) {
-            finalY = CGRectGetMaxY(frame)-height;
+//            finalY = CGRectGetMaxY(frame)-height;
         }
         else if (continuous) {
             finalY = CGRectGetMinY(frame);
